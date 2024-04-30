@@ -1,0 +1,27 @@
+.grid-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  width: 80vw; 
+  margin: auto;
+}
+
+.grid-row {
+  display: flex;
+}
+
+.grid-cell {
+  flex: 1;
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin: 2px;
+  font-size: 1em;
+  background-color: white;
+  color: black;
+}
+
+.grid-cell:hover {
+  background-color: #f0f0f0;
+}
