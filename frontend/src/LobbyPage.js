@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, TextField } from '@mui/material';
+import { Button, TextField, Typography } from '@mui/material';
 import Toast from './Toast';
 import { fetchWrapper, getUsername } from './Helpers';
 import { useNavigate } from "react-router-dom";
@@ -11,15 +11,17 @@ import InputLabel from '@mui/material/InputLabel';
 
 function TimerDropdown({ timer, setTimer }) {
     return (
-        <FormControl fullWidth>
-            <InputLabel id="timer-select-label">Set Timer (minutes)</InputLabel>
+        <FormControl>
+            <InputLabel id="timer-select-label">Timer (minutes)</InputLabel>
             <Select
                 labelId="timer-select-label"
                 id="timer-select"
                 value={timer}
-                label="Set Timer (minutes)"
+                label="Timer (minutes)"
                 onChange={(e) => setTimer(e.target.value)}
-                style={{ minWidth: '150px' }} 
+                style={{
+                    minWidth: '150px'
+                }}
             >
                 <MenuItem value={0}>
                     No timer
@@ -81,27 +83,26 @@ export default function LobbyPage() {
             {error && <Toast message={error} onClose={() => setError(null)} />}
             {message && <Toast message={message} onClose={() => setMessage(null)} isError={false} />}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-                <TextField
-                    label="Game ID"
-                    value={gameId}
-                    onChange={(e) => setGameId(e.target.value)}
-                />
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+                    <TextField
+                        label="Game ID"
+                        value={gameId}
+                        onChange={(e) => setGameId(e.target.value)}
+                    />
+                    <TimerDropdown timer={timer} setTimer={setTimer} />
+                </div>
                 <Button
                     variant="contained"
                     onClick={() => setHowToPlayOpen(true)}
                 >
                     How to Play
                 </Button>
-                <div style={{ display: 'flex', gap: '20px' }}>
-                    <Button
-                        style={{ minWidth: '150px' }}
-                        variant="contained"
-                        onClick={() => newGame(gameId)}
-                    >
-                        New Game
-                    </Button>
-                    <TimerDropdown timer={timer} setTimer={setTimer} />
-                </div>
+                <Button
+                    variant="contained"
+                    onClick={() => newGame(gameId)}
+                >
+                    New Game
+                </Button>
                 <Button
                     variant="contained"
                     onClick={() => joinGame(gameId)}

@@ -122,6 +122,8 @@ class Game():
         self.timer = timer
     
     def fresh(id, timer):
+        if timer == 0:
+            timer = None
         return Game(
             words=Words.fresh(),
             deck=Deck.fresh(),
