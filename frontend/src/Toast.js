@@ -1,6 +1,6 @@
 import React from 'react';
 import './Toast.css';
-import { Button, Typography } from '@material-ui/core';
+import { Button, Typography } from '@mui/material';
 
 const Toast = ({ message, onClose, style, isError=true }) => {
   return (
