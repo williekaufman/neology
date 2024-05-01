@@ -18,7 +18,7 @@ export function makeRequestOptions(body, method = 'POST') {
 
 
 export function fetchWrapper(url, body, method = 'POST') {
-    let fullURL = `${process.env.REACT_APP_URL || baseURL}${url}`
+    let fullUrl = `${process.env.REACT_APP_URL || baseURL}${url}`
 
     if (method === 'GET') {
         if (body) {
