@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchWrapper, getUsername } from './Helpers';
-import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from '@mui/material';
+import { TextField, Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from '@mui/material';
 import io from 'socket.io-client';
 import Toast from './Toast';
 import './GamePage.css';
+
+function label(rowIndex, columnIndex) {
+    let rowLabel = String.fromCharCode(65 + rowIndex);
+    let colLabel = columnIndex + 1;
+    return `${rowLabel}${colLabel}`;
+}
 
 function CurrentClue({ game, username }) {
     let currentClue = game.clue;
@@ -16,7 +22,7 @@ function CurrentClue({ game, username }) {
     let isMine = currentClue.username === username;
 
     let style = {
-        backgroundColor: isMine ? 'lightblue' : 'white',
+        backgroundColor: isMine ? 'pink' : 'white',
         padding: '10px',
         margin: '10px',
         textAlign: 'center',
@@ -31,20 +37,18 @@ function CurrentClue({ game, username }) {
 
 function GameGrid({ game, guess, username }) {
     let words = game.words;
-    let currentCard = game.outstanding.filter(clue => clue.username === username)?.[0];
+    let currentCard = game.outstanding.filter(clue => clue.username === username)?.[0]?.square;
 
     const handleButtonClick = (row, col) => {
         guess(row, col);
     };
 
-    function label(rowIndex, columnIndex) {
-        let rowLabel = String.fromCharCode(65 + rowIndex);
-        let colLabel = columnIndex + 1;
-        return `${rowLabel}${colLabel}`;
-    }
-
     function isMyCard(rowIndex, columnIndex) {
         return currentCard && currentCard.x === columnIndex && currentCard.y === rowIndex;
+    }
+
+    function isUsed(rowIndex, columnIndex) {
+        return game.correct.filter(square => square.x === columnIndex && square.y === rowIndex).length > 0;
     }
 
     return (
@@ -61,13 +65,13 @@ function GameGrid({ game, guess, username }) {
                 <TableBody>
                     {words.vertical.map((word, rowIndex) => (
                         <TableRow key={rowIndex}>
-                            <TableCell component="th" scope="row" align="center">{word}</TableCell> {/* Row label */}
+                            <TableCell component="th" scope="row" align="center">{word}</TableCell>
                             {Array.from({ length: 5 }).map((_, colIndex) => (
                                 <TableCell key={colIndex} align="center">
                                     <Button
                                         variant="outlined"
                                         onClick={() => handleButtonClick(rowIndex, colIndex)}
-                                        style={{ backgroundColor: isMyCard(rowIndex, colIndex) ? 'lightblue' : 'white' }}
+                                        style={{ backgroundColor: isMyCard(rowIndex, colIndex) ? 'pink' : isUsed(rowIndex, colIndex) ? 'lightgreen' : 'white' }}
                                     >
                                         {label(rowIndex, colIndex)}
                                     </Button>
@@ -81,14 +85,58 @@ function GameGrid({ game, guess, username }) {
     );
 };
 
-function Game({ game, username, guess }) {
+function ClueUI({ game, giveClue }) {
+  let [clue, setClue] = useState('');
+
+  let currentClue = game.clue;
+
+  if (currentClue) {
+    return null; 
+  }
+
+  function handleChange(event) {
+    setClue(event.target.value);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    giveClue(clue);
+    setClue('');
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" gap={2} marginTop={2}>
+        <TextField
+          label="Give clue"
+          variant="outlined"
+          value={clue}
+          onChange={handleChange}
+        />
+        <Button type="submit" variant="contained" color="primary">
+          Give Clue
+        </Button>
+      </Box>
+    </form>
+  );
+}
+
+function Game({ game, username, guess, drawCard, giveClue }) {
     if (!game) {
         return null
     }
 
+    let myCard = game.outstanding.filter(clue => clue.username === username)?.[0]?.square;
+
     return (
         <div className="game-container">
             <CurrentClue game={game} username={username} />
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Button disabled={!!myCard} variant="contained" onClick={drawCard} style={{ margin: '10px' }}>Draw Card</Button>
+                {myCard && <Typography variant="h5" style={{ margin: '10px' }}>Your card: {label(myCard.y, myCard.x)}</Typography>}
+                <Typography variant="h5" style={{ margin: '10px' }}>Remaining cards: {game.deck.squares.length}</Typography>
+            </div>
+            <ClueUI game={game} username={username} giveClue={giveClue} />
             <GameGrid game={game} guess={guess} username={username} />
         </div>
 
@@ -117,14 +165,18 @@ export default function GamePage() {
 
     useEffect(() => {
         if (!socket) {
-            setSocket(io.connect(process.env.REACT_APP_FULL_URL))
+            setSocket(io.connect(process.env.REACT_APP_BACKEND_API_URL))
         }
     }, [socket]);
 
     useEffect(() => {
         if (socket) {
             socket.emit('join', { room: id })
+            socket.on('disconnect', () => {
+                setSocket(null);
+            });
             socket.on('update', (data) => {
+                console.log('received update', data);
                 setGame(data.game);
             }
             )
@@ -133,13 +185,14 @@ export default function GamePage() {
         return () => {
             if (socket) {
                 socket.emit('leave', { room: id });
-                socket.disconnect();
+                socket.off('disconnect');
+                socket.off('update');
             }
         }
     }, [socket, id]);
 
     useEffect(() => {
-        fetchWrapper('/new_game', { id }, 'POST')
+        fetchWrapper('/game', { id }, 'GET')
             .then(response => {
                 if (response.success) {
                     setGame(response.game);
@@ -160,11 +213,33 @@ export default function GamePage() {
             })
     }
 
+    function drawCard() {
+        fetchWrapper('/draw_card', { id, username })
+            .then(response => {
+                if (response.success) {
+                    setGame(response.game);
+                } else {
+                    showMessage(response.error, true);
+                }
+            })
+    }
+
+    function giveClue(clue) {
+        fetchWrapper('/give_clue', { id, username, clue })
+            .then(response => {
+                if (response.success) {
+                    setGame(response.game);
+                } else {
+                    showMessage(response.error, true);
+                }
+            })
+    }
+
     return (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             {error && <Toast message={error} isError={true} />}
             {message && <Toast message={message} />}
-            <Game game={game} guess={guess} username={username} /> 
+            <Game game={game} guess={guess} drawCard={drawCard} giveClue={giveClue} username={username} />
         </div>
     )
 }

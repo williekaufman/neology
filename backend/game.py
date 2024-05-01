@@ -31,6 +31,11 @@ class Square():
         self.x = x
         self.y = y
         
+    def equals(self, other):
+        if not other:
+            return False
+        return self.x == other.x and self.y == other.y
+    
     def to_json(self):
         return {
             'x': self.x,
@@ -159,11 +164,11 @@ class Game():
         if username == self.clue.username:
             return "You can't guess your own clue", False
         is_correct = False
-        if square == self.clue.square:
+        if square.equals(self.clue.square):
             self.correct.append(square)
             is_correct = True
-        self.clue = None
         self.outstanding = [o for o in self.outstanding if o.username != self.clue.username]
+        self.clue = None
         self.write()
         return None, is_correct 
              

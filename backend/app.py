@@ -11,7 +11,7 @@ import traceback
 from functools import wraps
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 CORS(app)
 
 def recurse_to_json(obj):
@@ -73,7 +73,7 @@ def give_clue():
     if not game:
         return failure('Game not found')
     clue = request.json.get('clue')
-    if not square or not clue:
+    if not clue:
         return failure('Missing required fields')
     if (error := game.give_clue(clue, username)):
         return failure(error)
@@ -93,7 +93,7 @@ def guess():
         return failure('Game not found')
     row = request.json.get('row')
     col = request.json.get('col')
-    if not row or not col:
+    if row is None or col is None:
         return failure('Missing square')
     error, correct = game.guess(row, col, username)
     if error:
