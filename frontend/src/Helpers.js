@@ -44,7 +44,7 @@ export function fetchWrapper(url, body, method = 'POST') {
         });
 }
 
-export function getUsername() {
+export function getUsername(setHowToPlayOpen) {
     if (localStorage.getItem('username')) {
         return localStorage.getItem('username');
     }
@@ -55,6 +55,7 @@ export function getUsername() {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     localStorage.setItem('username', result);
+    setHowToPlayOpen && setHowToPlayOpen(true);
     return result;
 }
 

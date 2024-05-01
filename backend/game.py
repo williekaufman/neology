@@ -168,12 +168,13 @@ class Game():
             self.correct.append(square)
             is_correct = True
         self.outstanding = [o for o in self.outstanding if o.username != self.clue.username]
+        self.draw_card(self.clue.username)
         self.clue = None
         self.write()
         return None, is_correct 
              
     def to_json(self):
-        return {
+        ret = {
             'words': self.words.to_json(),
             'deck': self.deck.to_json(),
             'id': self.id,
@@ -181,6 +182,9 @@ class Game():
             'correct': [s.to_json() for s in self.correct],
             'outstanding': [o.to_json() for o in self.outstanding]
         }
+        if not self.outstanding and not self.deck.squares:
+            ret['finalScore'] = len(self.correct)
+        return ret
         
     def of_json(d):
         return Game(

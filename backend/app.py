@@ -49,7 +49,7 @@ def failure(reason, data=None):
     return jsonify({'success': False, 'error': reason, **(data or {})})
 
 def new_game_id():
-    return "-".join(random_words(2)) + '-' + token_hex(4)
+    return "-".join(random_words(2)) + '-' + token_hex(1)
 
 @app.route('/new_game', methods=['POST'])
 @api_endpoint
@@ -127,6 +127,19 @@ def game():
     if not game:
         return failure('Game not found')
     return success({'game': game.to_json()})
+
+@app.route('/refresh', methods=['POST'])
+@api_endpoint
+def refresh():
+    id = request.json.get('id')
+    if not id:
+        return failure('Missing id')
+    game = Game.of_id(id)
+    if not game:
+        return failure('Game not found')
+    game.refresh()
+    game.write()
+    return success_and_broadcast(game)
 
 @socketio.on('join')
 def on_join(data):

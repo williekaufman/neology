@@ -1,38 +1,57 @@
-.App {
-  text-align: center;
+html, body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, rgba(255, 175, 189, .5), rgba(195, 195, 160, .5));
+  background-attachment: fixed;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+@keyframes modalEntry {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.modal-animation {
+    animation: modalEntry 0.5s ease-out;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.modal-animation.fast {
+    animation: modalEntry 0.2s ease-out;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+    background-color: #007BFF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button.no-hover:hover {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f0f0f0;
+}
+.scrollbar-custom::-webkit-scrollbar {
+    width: 8px;
+}
+.scrollbar-custom::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+    border: 2px solid #f0f0f0;
 }

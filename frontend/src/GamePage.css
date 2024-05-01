@@ -1,27 +1,55 @@
-.grid-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  width: 80vw; 
-  margin: auto;
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
 }
 
-.grid-row {
-  display: flex;
+.clue {
+    padding: 10px;
+    margin: 10px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 2px solid #f0f0f0;
 }
 
-.grid-cell {
-  flex: 1;
-  border: 1px solid #ccc;
-  padding: 20px;
-  margin: 2px;
-  font-size: 1em;
-  background-color: white;
-  color: black;
+
+.clue.mine {
+    background-color: lightblue;
 }
 
-.grid-cell:hover {
-  background-color: #f0f0f0;
+
+.table-container {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.button-cell {
+    margin: 5px;
+}
+
+.button-cell button {
+    width: 100%;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.button-cell button:hover {
+    background-color: #f0f0f0; 
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.button-cell button:active {
+    transform: translateY(1px);
+}
+
+.form-control {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
 }
