@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWrapper, getUsername } from './Helpers';
 import { createTheme, ThemeProvider, TextField, Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from '@mui/material';
 import io from 'socket.io-client';
@@ -160,7 +160,7 @@ function ClueUI({ game, giveClue }) {
     );
 }
 
-function Game({ setHowToPlayOpen, game, username, refresh, guess, drawCard, giveClue }) {
+function Game({ backToLobby, setHowToPlayOpen, game, username, refresh, guess, drawCard, giveClue }) {
     if (!game) {
         return null
     }
@@ -170,7 +170,10 @@ function Game({ setHowToPlayOpen, game, username, refresh, guess, drawCard, give
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
                 <Typography variant="h4">Game Over</Typography>
                 <Typography variant="h5">Score: {game.finalScore}</Typography>
-                <Button variant="contained" onClick={refresh}>Play Again</Button>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <Button variant="contained" onClick={refresh}>Play Again</Button>
+                    <Button variant="contained" onClick={backToLobby}>Back to Lobby</Button>
+                </div>
                 <GameGrid game={game} guess={guess} username={username} />
             </div>
         )
@@ -205,6 +208,11 @@ export default function GamePage() {
     let [message, setMessage] = useState('');
     let [error, setError] = useState(null);
     let [howToPlayOpen, setHowToPlayOpen] = useState(false);
+    let navigate = useNavigate();
+
+    function backToLobby() {
+        navigate('/');
+    }
 
     let username = getUsername(setHowToPlayOpen);
 
@@ -312,7 +320,7 @@ export default function GamePage() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             {error && <Toast message={error} isError={true} />}
             {message && <Toast message={message} isError={false} />}
-            <Game game={game} guess={guess} drawCard={drawCard} giveClue={giveClue} username={username} refresh={refresh} setHowToPlayOpen={setHowToPlayOpen}/>
+            <Game game={game} guess={guess} drawCard={drawCard} giveClue={giveClue} username={username} refresh={refresh} setHowToPlayOpen={setHowToPlayOpen} backToLobby={backToLobby}/>
             <HowToPlayDialog open={howToPlayOpen} onClose={() => setHowToPlayOpen(false)} />
         </div>
     )
