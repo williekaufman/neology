@@ -4,14 +4,44 @@ import Toast from './Toast';
 import { fetchWrapper, getUsername } from './Helpers';
 import { useNavigate } from "react-router-dom";
 import HowToPlayDialog from './HowToPlayDialog';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+
+function TimerDropdown({ timer, setTimer }) {
+    return (
+        <FormControl fullWidth>
+            <InputLabel id="timer-select-label">Set Timer (minutes)</InputLabel>
+            <Select
+                labelId="timer-select-label"
+                id="timer-select"
+                value={timer}
+                label="Set Timer (minutes)"
+                onChange={(e) => setTimer(e.target.value)}
+                style={{ minWidth: '150px' }} 
+            >
+                <MenuItem value={0}>
+                    No timer
+                </MenuItem>
+                {Array.from({ length: 10 }, (_, i) => 5 + i).map((value) => (
+                    <MenuItem key={value} value={value}>
+                        {value}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
+    );
+}
 
 export default function LobbyPage() {
     let [gameId, setGameId] = useState('');
     let [message, setMessage] = useState(null);
     let [error, setError] = useState(null);
     let [howToPlayOpen, setHowToPlayOpen] = useState(false);
+    let [timer, setTimer] = useState(9);
     let navigate = useNavigate();
-  
+
     getUsername(setHowToPlayOpen);
 
     function showMessage(text, isError = false) {
@@ -25,7 +55,7 @@ export default function LobbyPage() {
     }
 
     function newGame(id) {
-        fetchWrapper('/new_game', { id }, 'POST')
+        fetchWrapper('/new_game', { id, timer: timer * 60 }, 'POST')
             .then(response => {
                 if (response.success) {
                     navigate(`/game/${response.game.id}`);
@@ -56,18 +86,22 @@ export default function LobbyPage() {
                     value={gameId}
                     onChange={(e) => setGameId(e.target.value)}
                 />
-                <Button 
+                <Button
                     variant="contained"
                     onClick={() => setHowToPlayOpen(true)}
                 >
                     How to Play
                 </Button>
-                <Button
-                    variant="contained"
-                    onClick={() => newGame(gameId)}
-                >
-                    New Game
-                </Button>
+                <div style={{ display: 'flex', gap: '20px' }}>
+                    <Button
+                        style={{ minWidth: '150px' }}
+                        variant="contained"
+                        onClick={() => newGame(gameId)}
+                    >
+                        New Game
+                    </Button>
+                    <TimerDropdown timer={timer} setTimer={setTimer} />
+                </div>
                 <Button
                     variant="contained"
                     onClick={() => joinGame(gameId)}

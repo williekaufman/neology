@@ -21,6 +21,7 @@ export default function HowToPlayDialog({ open, onClose }) {
                     <Typography variant="h6"> Minutia </Typography>
                     <p> The game technically doesn't require voice communication, but you should almost certainly be on a call or in person to discuss. </p>
                     <p> Traditionally, clues are a single word, cannot include any words on the board, must clue the meaning of the word (rather than things like location), and cannot be any word that has been said so far during the game. None of this is enforced by the game, though, so you can do whatever you agree on. </p>
+                    <p> Similarly, the timer isn't enforced. You can keep playing if you want. </p>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={onClose}>Close</Button>

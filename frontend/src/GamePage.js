@@ -157,7 +157,7 @@ function ClueUI({ game, giveClue }) {
                     value={clue}
                     onChange={handleChange}
                 />
-                <Button type="submit" variant="contained" color="primary">
+                <Button type="submit" variant="contained" color="primary" disabled={!clue}>
                     Give Clue
                 </Button>
             </Box>
@@ -165,10 +165,27 @@ function ClueUI({ game, giveClue }) {
     );
 }
 
-function Game({ backToLobby, setHowToPlayOpen, game, username, refresh, guess, drawCard, giveClue }) {
+function Game({ backToLobby, game, username, refresh, guess, drawCard, giveClue }) {
+    let [remainingTime, setRemainingTime] = useState(game?.remainingTime);
+
+    useEffect(() => {
+        let interval = setInterval(() => {
+            setRemainingTime(prev => prev - 1)
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (game?.remainingTime === undefined) return;
+        setRemainingTime(game?.remainingTime);
+    }, [game?.remainingTime]);
+
     if (!game) {
         return null
     }
+
+    let displayTime = remainingTime <= 0 ? '0:00' : !remainingTime ? '' : Math.floor(remainingTime / 60) + ':' + ('0' + Math.floor(remainingTime % 60)).slice(-2);
 
     if (game.finalScore !== undefined) {
         return (
@@ -194,10 +211,8 @@ function Game({ backToLobby, setHowToPlayOpen, game, username, refresh, guess, d
                     {myCard ? `${label(myCard.y, myCard.x)}` : 'Draw Card'}
                     {` (${game?.deck?.squares?.length} remaining)`}
                 </Button>
-                <Button variant="contained" onClick={() => setHowToPlayOpen(true)} style={{ margin: '10px' }}>
-                    How to Play
-                </Button>
-            </div>
+                <Typography variant="h4" style={{ minWidth: '100px', textAlign: 'center' }}>{displayTime}</Typography>
+           </div>
             <ClueUI game={game} username={username} giveClue={giveClue} />
             <GameGrid game={game} guess={guess} username={username} />
         </div>
@@ -325,7 +340,7 @@ export default function GamePage() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             {error && <Toast message={error} isError={true} />}
             {message && <Toast message={message} isError={false} />}
-            <Game game={game} guess={guess} drawCard={drawCard} giveClue={giveClue} username={username} refresh={refresh} setHowToPlayOpen={setHowToPlayOpen} backToLobby={backToLobby}/>
+            <Game game={game} guess={guess} drawCard={drawCard} giveClue={giveClue} username={username} refresh={refresh} backToLobby={backToLobby}/>
             <HowToPlayDialog open={howToPlayOpen} onClose={() => setHowToPlayOpen(false)} />
         </div>
     )

@@ -55,8 +55,9 @@ def new_game_id():
 @api_endpoint
 def new_game():
     id = request.json.get('id') or new_game_id()
+    timer = request.json.get('timer')
     try:
-        game = Game.fresh(id)
+        game = Game.fresh(id, timer)
     except Exception as e:
         return failure(str(e)) 
     game.write()

@@ -1,6 +1,7 @@
 import random
 from redis_utils import rget, rset, rset_json, rget_json
 from words import random_words
+from datetime import datetime
 
 class Words():
     def __init__(self, vertical, horizontal):
@@ -110,19 +111,22 @@ class OutstandingCard():
         )
 
 class Game():
-    def __init__(self, words, deck, id, clue=None, correct=None, outstanding=None):
+    def __init__(self, words, deck, id, clue=None, correct=None, outstanding=None, started_at=None, timer=None):
         self.words = words
         self.deck = deck
         self.id = id
         self.clue = clue
         self.correct = correct or []
         self.outstanding = outstanding or []
+        self.started_at = started_at
+        self.timer = timer
     
-    def fresh(id):
+    def fresh(id, timer):
         return Game(
             words=Words.fresh(),
             deck=Deck.fresh(),
-            id=id
+            id=id,
+            timer=timer
         )
         
     def refresh(self):
@@ -131,12 +135,15 @@ class Game():
         self.clue = None
         self.correct = []
         self.outstanding = []
+        self.started_at = None
    
     def draw_card(self, username):
         if not self.deck.squares:
             return "No cards left"
         if username in [o.username for o in self.outstanding]:
             return "You already have a card"
+        if self.started_at is None:
+            self.started_at = datetime.now()
         card = self.deck.squares.pop()
         self.outstanding.append(OutstandingCard(username, card))
         self.write()
@@ -164,7 +171,6 @@ class Game():
         if username == self.clue.username:
             return "You can't guess your own clue", False
         is_correct = False
-        print(square, self.clue.square, square.equals(self.clue.square))
         if square.equals(self.clue.square):
             self.correct.append(square)
             is_correct = True
@@ -181,10 +187,14 @@ class Game():
             'id': self.id,
             'clue': self.clue.to_json() if self.clue else None,
             'correct': [s.to_json() for s in self.correct],
-            'outstanding': [o.to_json() for o in self.outstanding]
+            'outstanding': [o.to_json() for o in self.outstanding],
+            'started_at': self.started_at.timestamp() if self.started_at else None,
+            'timer': self.timer,
         }
         if not self.outstanding and not self.deck.squares:
             ret['finalScore'] = len(self.correct)
+        if self.timer is not None and self.started_at is not None:
+            ret['remainingTime'] = max(0, self.timer - (datetime.now() - self.started_at).total_seconds())
         return ret
         
     def of_json(d):
@@ -194,7 +204,9 @@ class Game():
             id=d['id'],
             clue=Clue.of_json(d['clue']) if d['clue'] else None,
             correct=[Square.of_json(s) for s in d['correct']],
-            outstanding=[OutstandingCard.of_json(o) for o in d['outstanding']]
+            outstanding=[OutstandingCard.of_json(o) for o in d['outstanding']],
+            started_at=datetime.fromtimestamp(d['started_at']) if d['started_at'] else None,
+            timer=d['timer']
         )
         
     def of_id(id):
