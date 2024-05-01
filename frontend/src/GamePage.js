@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { baseUrl } from './Settings';
+import { baseURL } from './Settings';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWrapper, getUsername } from './Helpers';
 import { createTheme, ThemeProvider, TextField, Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from '@mui/material';
@@ -234,7 +234,7 @@ export default function GamePage() {
 
     useEffect(() => {
         if (!socket) {
-            setSocket(io.connect(baseUrl))
+            setSocket(io.connect(baseURL))
         }
     }, [socket]);
 
