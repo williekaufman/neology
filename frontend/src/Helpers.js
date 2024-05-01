@@ -1,4 +1,4 @@
-import { URL } from './Settings';
+import { baseURL } from './Settings';
 
 export function makeRequestOptions(body, method = 'POST') {
     if (method === 'GET') {
@@ -18,7 +18,7 @@ export function makeRequestOptions(body, method = 'POST') {
 
 
 export function fetchWrapper(url, body, method = 'POST') {
-    let fullUrl = `${process.env.REACT_APP_URL || URL}${url}`
+    let fullURL = `${process.env.REACT_APP_URL || baseURL}${url}`
 
     if (method === 'GET') {
         if (body) {
