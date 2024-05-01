@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, TextField, Typography } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import Toast from './Toast';
 import { fetchWrapper, getUsername } from './Helpers';
 import { useNavigate } from "react-router-dom";
