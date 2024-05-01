@@ -58,7 +58,11 @@ function CurrentClue({ game, username }) {
     const isMine = clue.username === username;
     const className = `clue ${isMine ? 'mine' : ''}`;
 
-    return <Typography variant="h5" className={className}>{clue.text}</Typography>;
+    return (
+        <div className={className}>
+            <Typography variant="h4">Current clue{isMine ? ' (yours)' : ''}: {clue.text}</Typography>
+        </div>
+    )
 }
 
 function GameGrid({ game, guess, username }) {
@@ -91,14 +95,14 @@ function GameGrid({ game, guess, username }) {
                         <TableRow>
                             <TableCell align="center" sx={{ border: 'none', visibility: 'hidden' }} />
                             {words.horizontal.map((word, index) => (
-                                <TableCell key={index} align="center" style={{ minWidth: '80px', borderRadius: '5px', backgroundColor: 'orange' }}>{word}</TableCell>
+                                <TableCell key={index} align="center" style={{ minWidth: '80px', borderRadius: '5px', backgroundColor: 'orange', fontWeight: 'bold' }}>{word}</TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {words.vertical.map((word, rowIndex) => (
                             <TableRow key={rowIndex}>
-                                <TableCell component="th" scope="row" align="center" style={{ borderRadius: '5px', backgroundColor: 'orange' }}>{word}</TableCell>
+                                <TableCell component="th" scope="row" align="center" style={{ fontWeight: 'bold', borderRadius: '5px', backgroundColor: 'orange' }}>{word}</TableCell>
                                 {Array.from({ length: 5 }).map((_, colIndex) => (
                                     <TableCell key={colIndex} align="center" className="button-cell" sx={{
                                         borderRadius: '5px',
@@ -229,7 +233,7 @@ export default function GamePage() {
 
     useEffect(() => {
         if (!socket) {
-            setSocket(io.connect(process.env.REACT_APP_BACKEND_API_URL))
+            setSocket(io.connect(process.env.REACT_APP_URL))
         }
     }, [socket]);
 
