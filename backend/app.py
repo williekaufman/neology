@@ -150,4 +150,4 @@ def on_leave(data):
     leave_room(data['room'])
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5001)
+    socketio.run(app, debug=True, port=5021)

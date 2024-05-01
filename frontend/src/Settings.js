@@ -1,0 +1,1 @@
+export const baseURL = process.env.REACT_APP_URL || 'https://glydergames.com/neologisms/app'
