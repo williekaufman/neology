@@ -156,7 +156,7 @@ class Game():
     def guess(self, row, col, username):
         if row < 0 or row >= 5 or col < 0 or col >= 5:
             return "Invalid square", False
-        square = Square(row, col)
+        square = Square(col, row)
         if not self.clue:
             return "No clue given", False
         if square in self.correct:
@@ -164,6 +164,7 @@ class Game():
         if username == self.clue.username:
             return "You can't guess your own clue", False
         is_correct = False
+        print(square, self.clue.square, square.equals(self.clue.square))
         if square.equals(self.clue.square):
             self.correct.append(square)
             is_correct = True

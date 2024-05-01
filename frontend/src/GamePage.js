@@ -148,7 +148,6 @@ function ClueUI({ game, giveClue }) {
         <form onSubmit={handleSubmit}>
             <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" gap={2} marginTop={2}>
                 <TextField
-                    label="Give clue"
                     variant="outlined"
                     value={clue}
                     onChange={handleChange}
@@ -183,8 +182,9 @@ function Game({ setHowToPlayOpen, game, username, refresh, guess, drawCard, give
         <div className="game-container">
             <CurrentClue game={game} username={username} />
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Button disabled={!!myCard} variant="contained" onClick={drawCard} style={{ margin: '10px' }}>
-                    {`Draw Card (${game?.deck?.squares?.length})`}
+                <Button disabled={!!myCard} variant="contained" onClick={drawCard} style={{ margin: '10px', color: !!myCard ? 'black' : 'white' }}>
+                    {myCard ? `${label(myCard.y, myCard.x)}` : 'Draw Card'}
+                    {` (${game?.deck?.squares?.length} remaining)`}
                 </Button>
                 <Button variant="contained" onClick={() => setHowToPlayOpen(true)} style={{ margin: '10px' }}>
                     How to Play
