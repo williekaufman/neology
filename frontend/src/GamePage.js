@@ -185,7 +185,7 @@ function Game({ backToLobby, game, username, refresh, guess, drawCard, giveClue 
         return null
     }
 
-    let displayTime = remainingTime <= 0 ? '0:00' : !remainingTime ? '' : Math.floor(remainingTime / 60) + ':' + ('0' + Math.floor(remainingTime % 60)).slice(-2);
+    let displayTime = (game?.remainingTime !== 0 && !game?.remainingTime) ? '' : remainingTime <= 0 ? '0:00' : !remainingTime ? '' : Math.floor(remainingTime / 60) + ':' + ('0' + Math.floor(remainingTime % 60)).slice(-2);
 
     if (game.finalScore !== undefined) {
         return (
@@ -211,7 +211,10 @@ function Game({ backToLobby, game, username, refresh, guess, drawCard, giveClue 
                     {myCard ? `${label(myCard.y, myCard.x)}` : 'Draw Card'}
                     {` (${game?.deck?.squares?.length} remaining)`}
                 </Button>
-                <Typography variant="h4" style={{ minWidth: '100px', textAlign: 'center' }}>{displayTime}</Typography>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <Typography variant="h4" style={{ minWidth: '100px', textAlign: 'center', color: displayTime === '0:00' ? 'red' : 'black'}}>{displayTime}</Typography>
+                    {displayTime === '0:00' && <Button variant="contained" onClick={refresh}>Start New Game</Button>}
+                </div>
            </div>
             <ClueUI game={game} username={username} giveClue={giveClue} />
             <GameGrid game={game} guess={guess} username={username} />
