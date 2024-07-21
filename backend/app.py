@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 from flask import Flask, jsonify, request, make_response, render_template
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from flask_cors import CORS, cross_origin
@@ -50,6 +51,13 @@ def failure(reason, data=None):
 
 def new_game_id():
     return "-".join(random_words(2)) + '-' + token_hex(1)
+
+
+@app.route('/status', methods=['GET'])
+@api_endpoint
+def status():
+    return success({'status': 'ok'})
+
 
 @app.route('/new_game', methods=['POST'])
 @api_endpoint
@@ -151,4 +159,5 @@ def on_leave(data):
     leave_room(data['room'])
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5021, host='0.0.0.0')
+    socketio.run(app, debug=True, port=os.getenv('BACKEND_PORT', 5021), host='0.0.0.0',
+                 allow_unsafe_werkzeug=True)

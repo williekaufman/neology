@@ -1,0 +1,20 @@
+__pycache__/
+local_settings.py
+
+
+# IDEs and editors
+.vscode/
+
+
+# Compiled files
+*.pyc
+*.pyo
+*.pyd
+*__pycache__*
+
+
+frontend/node_modules/
+
+# Miscellaneous
+.DS_Store
+env
