@@ -20,3 +20,6 @@ The deafult ports the containers are mirrored to are chosen to not conflict with
 If you change BACKEND_PORT, you will need to change the port in the `nginx/default.conf` file to match.
 
 If you change NGINX_PORT, you will need to change the port in the `frontend/.env` file to match.
+
+# Lint
+npm run pretty
