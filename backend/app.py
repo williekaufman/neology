@@ -12,7 +12,7 @@ import traceback
 from functools import wraps
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", ping_interval=25, ping_timeout=60)
 CORS(app)
 
 def recurse_to_json(obj):
@@ -57,6 +57,10 @@ def new_game_id():
 @api_endpoint
 def status():
     return success({'status': 'ok'})
+
+@app.route('/ping', methods=['GET'])
+def ping():
+    return jsonify({'status': 'ok'})
 
 
 @app.route('/new_game', methods=['POST'])

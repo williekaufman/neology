@@ -276,8 +276,8 @@ function Game({
         : !remainingTime
           ? ""
           : Math.floor(remainingTime / 60) +
-            ":" +
-            ("0" + Math.floor(remainingTime % 60)).slice(-2);
+          ":" +
+          ("0" + Math.floor(remainingTime % 60)).slice(-2);
 
   if (game.finalScore !== undefined) {
     return (
@@ -386,7 +386,6 @@ export default function GamePage() {
       setTimeout(() => setMessage(null), 3000);
     }
   }
-
   useEffect(() => {
     if (!socket) {
       setSocket(io.connect(baseURL));
