@@ -14,52 +14,21 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Button,
+  Button as MuiButton,
   Paper,
+  useMediaQuery,
 } from "@mui/material";
 import io from "socket.io-client";
 import Toast from "./Toast";
 import HowToPlayDialog from "./HowToPlayDialog";
 import "./GamePage.css";
 
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
-    },
-    primary: {
-      main: "#ff1744",
-    },
-    secondary: {
-      main: "#2979ff",
-    },
-    text: {
-      primary: "#333",
-      secondary: "#555",
-    },
-  },
-  components: {
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          border: "2px solid black",
-          borderRadius: "5px",
-          backgroundColor: "white",
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "lightblue",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 8px 16px 0 rgba(0,0,0,0.2)",
-        },
-      },
-    },
-  },
-});
+function Button(props) {
+  let isSmallScreen = useMediaQuery("(max-width:600px)");
+  isSmallScreen = true;
+  const size = isSmallScreen ? "small" : undefined;
+  return <MuiButton {...props} size={size} />;
+}
 
 function label(rowIndex, columnIndex) {
   let rowLabel = String.fromCharCode(65 + rowIndex);
@@ -67,29 +36,39 @@ function label(rowIndex, columnIndex) {
   return `${rowLabel}${colLabel}`;
 }
 
-function CurrentClue({ game, username }) {
+function CurrentClue({ game, username, isSmallScreen }) {
   let clue = game?.clue;
   if (!clue) return null;
   const isMine = clue.username === username;
   const className = `clue ${isMine ? "mine" : ""}`;
 
   return (
-    <div className={className}>
-      <Typography variant="h4">
+    <Box
+      display="flex"
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="center"
+      gap={2}
+      className={className}
+      marginTop={2}
+    >
+      <Typography size={isSmallScreen ? "small" : "medium"}>
         Current clue{isMine ? " (yours)" : ""}: {clue.text}
       </Typography>
-    </div>
+    </Box>
   );
 }
 
-function GameGrid({ game, guess, username }) {
+function GameGrid({ game, guess, username, disableGuesses, isSmallScreen }) {
   let words = game.words;
   let currentCard = game.outstanding.filter(
     (clue) => clue.username === username,
   )?.[0]?.square;
 
   const handleButtonClick = (row, col) => {
-    guess(row, col);
+    if (!disableGuesses) {
+      guess(row, col);
+    }
   };
 
   function isMyCard(rowIndex, columnIndex) {
@@ -110,12 +89,53 @@ function GameGrid({ game, guess, username }) {
 
   function isDisabled(rowIndex, columnIndex) {
     return (
+      disableGuesses ||
       !game.clue ||
       isUsed(rowIndex, columnIndex) ||
       isMyCard(rowIndex, columnIndex) ||
       isMyClue
     );
   }
+  const theme = createTheme({
+    palette: {
+      background: {
+        default: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+      },
+      primary: {
+        main: "#ff1744",
+      },
+      secondary: {
+        main: "#2979ff",
+      },
+      text: {
+        primary: "#333",
+        secondary: "#555",
+      },
+    },
+    components: {
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            border: "2px solid black",
+            borderRadius: "5px",
+            backgroundColor: "white",
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: isSmallScreen
+          ? { root: { backgroundColor: "inherit" } }
+          : {
+              root: {
+                backgroundColor: "lightblue",
+                padding: "20px",
+                borderRadius: "8px",
+                boxShadow: "0 8px 16px 0 rgba(0,0,0,0.2)",
+              },
+            },
+      },
+    },
+  });
 
   return (
     <ThemeProvider theme={theme}>
@@ -131,8 +151,8 @@ function GameGrid({ game, guess, username }) {
                 <TableCell
                   key={index}
                   align="center"
-                  style={{
-                    minWidth: "80px",
+                  sx={{
+                    minWidth: isSmallScreen ? "40px" : "80px",
                     borderRadius: "5px",
                     backgroundColor: "orange",
                     fontWeight: "bold",
@@ -150,7 +170,7 @@ function GameGrid({ game, guess, username }) {
                   component="th"
                   scope="row"
                   align="center"
-                  style={{
+                  sx={{
                     fontWeight: "bold",
                     borderRadius: "5px",
                     backgroundColor: "orange",
@@ -176,10 +196,11 @@ function GameGrid({ game, guess, username }) {
                     <Button
                       onClick={() => handleButtonClick(rowIndex, colIndex)}
                       disabled={isDisabled(rowIndex, colIndex)}
-                      style={{
+                      sx={{
                         color: "black",
                         height: "100%",
-                        padding: "16px",
+                        padding: isSmallScreen ? "4px" : "8px",
+                        fontSize: isSmallScreen ? "12px" : "inherit",
                       }}
                       fullWidth
                       className="no-hover"
@@ -197,7 +218,7 @@ function GameGrid({ game, guess, username }) {
   );
 }
 
-function ClueUI({ game, giveClue }) {
+function ClueUI({ game, giveClue, isSmallScreen }) {
   let [clue, setClue] = useState("");
 
   let currentClue = game.clue;
@@ -226,7 +247,12 @@ function ClueUI({ game, giveClue }) {
         gap={2}
         marginTop={2}
       >
-        <TextField variant="outlined" value={clue} onChange={handleChange} />
+        <TextField
+          size={isSmallScreen ? "small" : "medium"}
+          variant="outlined"
+          value={clue}
+          onChange={handleChange}
+        />
         <Button
           type="submit"
           variant="contained"
@@ -248,8 +274,12 @@ function Game({
   guess,
   drawCard,
   giveClue,
+  isSmallScreen,
 }) {
   let [remainingTime, setRemainingTime] = useState(game?.remainingTime);
+  let [backgroundColor, setBackgroundColor] = useState("inherit");
+  let [disableGuesses, setDisableGuesses] = useState(false);
+  let [fadeClass, setFadeClass] = useState("");
 
   useEffect(() => {
     let interval = setInterval(() => {
@@ -264,6 +294,17 @@ function Game({
     setRemainingTime(game?.remainingTime);
   }, [game?.remainingTime]);
 
+  useEffect(() => {
+    if (game?.clue && game.clue.username !== username) {
+      setFadeClass("fade-background");
+      setDisableGuesses(true);
+      setTimeout(() => {
+        setFadeClass("");
+        setDisableGuesses(false);
+      }, 3000);
+    }
+  }, [game?.clue, username]);
+
   if (!game) {
     return null;
   }
@@ -276,8 +317,8 @@ function Game({
         : !remainingTime
           ? ""
           : Math.floor(remainingTime / 60) +
-          ":" +
-          ("0" + Math.floor(remainingTime % 60)).slice(-2);
+            ":" +
+            ("0" + Math.floor(remainingTime % 60)).slice(-2);
 
   if (game.finalScore !== undefined) {
     return (
@@ -308,7 +349,13 @@ function Game({
             Back to Lobby
           </Button>
         </div>
-        <GameGrid game={game} guess={guess} username={username} />
+        <GameGrid
+          game={game}
+          guess={guess}
+          username={username}
+          disableGuesses={disableGuesses}
+          isSmallScreen={isSmallScreen}
+        />
       </div>
     );
   }
@@ -318,8 +365,7 @@ function Game({
   )?.[0]?.square;
 
   return (
-    <div className="game-container">
-      <CurrentClue game={game} username={username} />
+    <div className={`game-container ${fadeClass}`} style={{ backgroundColor }}>
       <div
         style={{
           display: "flex",
@@ -332,7 +378,10 @@ function Game({
           disabled={!!myCard}
           variant="contained"
           onClick={drawCard}
-          style={{ margin: "10px", color: !!myCard ? "black" : "white" }}
+          style={{
+            margin: isSmallScreen ? "0px" : "10px",
+            color: !!myCard ? "black" : "white",
+          }}
         >
           {myCard ? `${label(myCard.y, myCard.x)}` : "Draw Card"}
           {` (${game?.deck?.squares?.length} remaining)`}
@@ -341,7 +390,7 @@ function Game({
           <Typography
             variant="h4"
             style={{
-              minWidth: "100px",
+              minWidth: isSmallScreen ? "50px" : "100px",
               textAlign: "center",
               color: displayTime === "0:00" ? "red" : "black",
             }}
@@ -355,8 +404,24 @@ function Game({
           )}
         </div>
       </div>
-      <ClueUI game={game} username={username} giveClue={giveClue} />
-      <GameGrid game={game} guess={guess} username={username} />
+      <CurrentClue
+        game={game}
+        username={username}
+        isSmallScreen={isSmallScreen}
+      />
+      <ClueUI
+        game={game}
+        username={username}
+        giveClue={giveClue}
+        isSmallScreen={isSmallScreen}
+      />
+      <GameGrid
+        game={game}
+        guess={guess}
+        username={username}
+        isSmallScreen={isSmallScreen}
+        disableGuesses={disableGuesses}
+      />
     </div>
   );
 }
@@ -369,6 +434,8 @@ export default function GamePage() {
   let [error, setError] = useState(null);
   let [howToPlayOpen, setHowToPlayOpen] = useState(false);
   let navigate = useNavigate();
+  let isSmallScreen = useMediaQuery("(max-width:600px)");
+  isSmallScreen = true;
 
   function backToLobby() {
     navigate("/");
@@ -377,7 +444,6 @@ export default function GamePage() {
   let username = getUsername(setHowToPlayOpen);
 
   function showMessage(text, isError = false) {
-    console.log(text, isError);
     if (isError) {
       setError(text);
       setTimeout(() => setError(null), 3000);
@@ -476,6 +542,7 @@ export default function GamePage() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        padding: isSmallScreen ? "10px" : "20px",
       }}
     >
       {error && <Toast message={error} isError={true} />}
@@ -488,6 +555,7 @@ export default function GamePage() {
         username={username}
         refresh={refresh}
         backToLobby={backToLobby}
+        isSmallScreen={isSmallScreen}
       />
       <HowToPlayDialog
         open={howToPlayOpen}

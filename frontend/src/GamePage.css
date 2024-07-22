@@ -11,11 +11,26 @@
     margin: 10px;
     text-align: center;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 2px solid #f0f0f0;
-    background-color: #f0f0f0; 
+    background-color: #f0f0f0;
 }
 
+.fade-background {
+    animation: fadeIn 3s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        background-color: rgba(255, 255, 0, 0.3);
+        /* light yellow with low opacity */
+    }
+
+    to {
+        background-color: inherit;
+        /* normal background color */
+    }
+}
 
 .clue.mine {
     background-color: lightblue;
@@ -37,9 +52,9 @@
 }
 
 .button-cell button:hover {
-    background-color: #f0f0f0; 
+    background-color: #f0f0f0;
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .button-cell button:active {
@@ -53,4 +68,56 @@
     justify-content: center;
     gap: 10px;
     margin-top: 20px;
+}
+
+@media (max-height: 500px) {
+    .clue {
+        padding: 4px;
+        margin: 0px;
+        font-size: 10px;
+    }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .button-cell {
+        padding: 0 !important;
+    }
+
+    .button-cell button {
+        font-size: 10px;
+        padding: 8px !important;
+    }
+
+    .game-container {
+        padding: 2px;
+    }
+
+    .game-container .MuiTypography-h4 {
+        font-size: 1.5rem;
+    }
+
+    .game-container .MuiTypography-h5 {
+        font-size: 1.2rem;
+    }
+
+    .game-container .MuiButton-root {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .game-container {
+        width: 100%;
+    }
+
+    .game-container .MuiTableCell-root {
+        padding: 0px;
+    }
+
+    .game-container .MuiTableCell-root button {
+        padding: 2px;
+        font-size: 10px;
+    }
 }
