@@ -17,6 +17,10 @@ import {
   Button as MuiButton,
   Paper,
   useMediaQuery,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import io from "socket.io-client";
 import Toast from "./Toast";
@@ -24,8 +28,7 @@ import HowToPlayDialog from "./HowToPlayDialog";
 import "./GamePage.css";
 
 function Button(props) {
-  let isSmallScreen = useMediaQuery("(max-width:600px)");
-  isSmallScreen = true;
+  let isSmallScreen = useMediaQuery("(max-height:600px)");
   const size = isSmallScreen ? "small" : undefined;
   return <MuiButton {...props} size={size} />;
 }
@@ -434,9 +437,11 @@ export default function GamePage() {
   let [message, setMessage] = useState("");
   let [error, setError] = useState(null);
   let [howToPlayOpen, setHowToPlayOpen] = useState(false);
+  let [displayName, setDisplayName] = useState(getDisplayName(getUsername()));
+  let [dialogOpen, setDialogOpen] = useState(false);
+  let [newDisplayName, setNewDisplayName] = useState(displayName);
   let navigate = useNavigate();
-  let isSmallScreen = useMediaQuery("(max-width:600px)");
-  isSmallScreen = true;
+  let isSmallScreen = useMediaQuery("(max-height:600px)");
 
   function backToLobby() {
     navigate("/");
@@ -453,6 +458,26 @@ export default function GamePage() {
       setTimeout(() => setMessage(null), 3000);
     }
   }
+
+  function handleDisplayNameChange(event) {
+    setNewDisplayName(event.target.value);
+  }
+
+  function handleDialogOpen() {
+    setDialogOpen(true);
+  }
+
+  function handleDialogClose() {
+    setDialogOpen(false);
+  }
+
+  function handleDialogSave() {
+    setDisplayName(newDisplayName);
+    const newUsername = `${username.split("#")[0]}#${newDisplayName}`;
+    localStorage.setItem("username", newUsername);
+    setDialogOpen(false);
+  }
+
   useEffect(() => {
     if (!socket) {
       setSocket(io.connect(baseURL));
@@ -551,6 +576,33 @@ export default function GamePage() {
         padding: isSmallScreen ? "10px" : "20px",
       }}
     >
+      <div style={{ position: "absolute", top: 10, left: 10 }}>
+        <Button variant="outlined" onClick={handleDialogOpen}>
+          Your name: {displayName}
+        </Button>
+      </div>
+      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>Edit Display Name</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Display Name"
+            type="text"
+            fullWidth
+            value={newDisplayName}
+            onChange={handleDisplayNameChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDialogSave} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
       {error && (
         <Toast
           message={error}

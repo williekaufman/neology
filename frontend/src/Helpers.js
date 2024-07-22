@@ -45,17 +45,67 @@ export function fetchWrapper(url, body, method = "POST") {
     });
 }
 
+const displayNames = [
+  "Apple",
+  "Banana",
+  "Cherry",
+  "Date",
+  "Elderberry",
+  "Fig",
+  "Grape",
+  "Honeydew",
+  "Kiwi",
+  "Lemon",
+  "Mango",
+  "Nectarine",
+  "Orange",
+  "Papaya",
+  "Quince",
+  "Raspberry",
+  "Strawberry",
+  "Tomato",
+  "Ugli Fruit",
+  "Vanilla",
+  "Watermelon",
+  "Xigua",
+  "Yam",
+  "Zucchini",
+  "Ant",
+  "Bear",
+  "Cat",
+  "Dog",
+  "Elephant",
+  "Frog",
+  "Giraffe",
+  "Horse",
+  "Iguana",
+  "Jaguar",
+  "Kangaroo",
+  "Lion",
+  "Monkey",
+  "Newt",
+  "Owl",
+  "Penguin",
+  "Quail",
+  "Rabbit",
+  "Snake",
+];
+
 export function getUsername(setHowToPlayOpen, reset = false) {
   let username = localStorage.getItem("username");
-  let displayName = username.split("#")[1];
+  let displayName = username ? username.split("#")[1] : null;
 
   if (!username || !displayName || reset) {
     username = generateRandomUsername(setHowToPlayOpen);
-    displayName = prompt("Please enter your display name:", "");
-    if (displayName) {
-      username = `${username}#${displayName}`;
-      localStorage.setItem("username", username);
+    if (reset) {
+      displayName = prompt("Please enter your display name:", "");
     }
+    if (!displayName) {
+      displayName =
+        displayNames[Math.floor(Math.random() * displayNames.length)];
+    }
+    username = `${username}#${displayName}`;
+    localStorage.setItem("username", username);
   }
   return `${username}#${displayName}`;
 }

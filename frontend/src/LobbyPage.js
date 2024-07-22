@@ -42,9 +42,7 @@ export default function LobbyPage() {
   let [timer, setTimer] = useState(9);
   let navigate = useNavigate();
 
-  useEffect(() => {
-    getUsername(setHowToPlayOpen, true);
-  }, []);
+  getUsername(setHowToPlayOpen);
 
   function showMessage(text, isError = false) {
     if (isError) {
