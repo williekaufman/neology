@@ -45,10 +45,26 @@ export function fetchWrapper(url, body, method = "POST") {
     });
 }
 
-export function getUsername(setHowToPlayOpen) {
-  if (localStorage.getItem("username")) {
-    return localStorage.getItem("username");
+export function getUsername(setHowToPlayOpen, reset = false) {
+  let username = localStorage.getItem("username");
+  let displayName = username.split("#")[1];
+
+  if (!username || !displayName || reset) {
+    username = generateRandomUsername(setHowToPlayOpen);
+    displayName = prompt("Please enter your display name:", "");
+    if (displayName) {
+      username = `${username}#${displayName}`;
+      localStorage.setItem("username", username);
+    }
   }
+  return `${username}#${displayName}`;
+}
+
+export function getDisplayName(username) {
+  return username.split("#")[1];
+}
+
+function generateRandomUsername(setHowToPlayOpen) {
   let result = "";
   let characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -56,7 +72,6 @@ export function getUsername(setHowToPlayOpen) {
   for (let i = 0; i < 16; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
-  localStorage.setItem("username", result);
   setHowToPlayOpen && setHowToPlayOpen(true);
   return result;
 }

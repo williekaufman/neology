@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { baseURL } from "./Settings";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchWrapper, getUsername } from "./Helpers";
+import { fetchWrapper, getUsername, getDisplayName } from "./Helpers";
 import {
   createTheme,
   ThemeProvider,
@@ -41,6 +41,7 @@ function CurrentClue({ game, username, isSmallScreen }) {
   if (!clue) return null;
   const isMine = clue.username === username;
   const className = `clue ${isMine ? "mine" : ""}`;
+  const displayName = getDisplayName(clue.username);
 
   return (
     <Box
@@ -53,12 +54,12 @@ function CurrentClue({ game, username, isSmallScreen }) {
       marginTop={2}
     >
       <Typography size={isSmallScreen ? "small" : "medium"}>
-        Current clue{isMine ? " (yours)" : ""}: {clue.text}
+        {displayName || "Someone else"}'s clue{isMine ? " (yours)" : ""}:{" "}
+        {clue.text}
       </Typography>
     </Box>
   );
 }
-
 function GameGrid({ game, guess, username, disableGuesses, isSmallScreen }) {
   let words = game.words;
   let currentCard = game.outstanding.filter(
@@ -535,6 +536,11 @@ export default function GamePage() {
     });
   }
 
+  const handleToastClick = () => {
+    setMessage("");
+    setError(null);
+  };
+
   return (
     <div
       style={{
@@ -545,8 +551,22 @@ export default function GamePage() {
         padding: isSmallScreen ? "10px" : "20px",
       }}
     >
-      {error && <Toast message={error} isError={true} />}
-      {message && <Toast message={message} isError={false} />}
+      {error && (
+        <Toast
+          message={error}
+          isError={true}
+          size={isSmallScreen ? "small" : "medium"}
+          onClick={handleToastClick}
+        />
+      )}
+      {message && (
+        <Toast
+          message={message}
+          isError={false}
+          size={isSmallScreen ? "small" : "medium"}
+          onClick={handleToastClick}
+        />
+      )}
       <Game
         game={game}
         guess={guess}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, TextField } from "@mui/material";
 import Toast from "./Toast";
 import { fetchWrapper, getUsername } from "./Helpers";
@@ -42,7 +42,9 @@ export default function LobbyPage() {
   let [timer, setTimer] = useState(9);
   let navigate = useNavigate();
 
-  getUsername(setHowToPlayOpen);
+  useEffect(() => {
+    getUsername(setHowToPlayOpen, true);
+  }, []);
 
   function showMessage(text, isError = false) {
     if (isError) {
