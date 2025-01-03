@@ -197,7 +197,7 @@ function GameGrid({ game, guess, username, disableGuesses, isSmallScreen }) {
                             ? "white"
                             : "lightgray",
                       padding: 0,
-                      height: "60px"
+                      height: isSmallScreen ? "40px" : "60px"
                     }}
                   >
                     <Button
