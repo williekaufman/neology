@@ -412,7 +412,7 @@ function Game({
           )}
         </div>
       </div>
-      <div style={{ minHeight: "80px" }}>
+      <div style={{ minHeight: isSmallScreen ? "60px" : "80px" }}>
         <CurrentClue
           game={game}
           username={username}
