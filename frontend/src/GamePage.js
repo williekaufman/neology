@@ -130,13 +130,13 @@ function GameGrid({ game, guess, username, disableGuesses, isSmallScreen }) {
         styleOverrides: isSmallScreen
           ? { root: { backgroundColor: "inherit" } }
           : {
-              root: {
-                backgroundColor: "lightblue",
-                padding: "20px",
-                borderRadius: "8px",
-                boxShadow: "0 8px 16px 0 rgba(0,0,0,0.2)",
-              },
+            root: {
+              backgroundColor: "lightblue",
+              padding: "20px",
+              borderRadius: "8px",
+              boxShadow: "0 8px 16px 0 rgba(0,0,0,0.2)",
             },
+          },
       },
     },
   });
@@ -194,7 +194,8 @@ function GameGrid({ game, guess, username, disableGuesses, isSmallScreen }) {
                         : isUsed(rowIndex, colIndex)
                           ? "lightgreen"
                           : "white",
-                      padding: "0px",
+                      padding: 0,
+                      height: "60px"
                     }}
                   >
                     <Button
@@ -203,10 +204,11 @@ function GameGrid({ game, guess, username, disableGuesses, isSmallScreen }) {
                       sx={{
                         color: "black",
                         height: "100%",
-                        padding: isSmallScreen ? "4px" : "8px",
+                        width: "100%",
                         fontSize: isSmallScreen ? "12px" : "inherit",
+                        padding: 0,
+                        minHeight: "100%",
                       }}
-                      fullWidth
                       className="no-hover"
                     >
                       {label(rowIndex, colIndex)}
@@ -298,16 +300,16 @@ function Game({
     setRemainingTime(game?.remainingTime);
   }, [game?.remainingTime]);
 
-  useEffect(() => {
-    if (game?.clue && game.clue.username !== username) {
-      setFadeClass("fade-background");
-      setDisableGuesses(true);
-      setTimeout(() => {
-        setFadeClass("");
-        setDisableGuesses(false);
-      }, 3000);
-    }
-  }, [game?.clue, username]);
+  // useEffect(() => {
+  //   if (game?.clue && game.clue.username !== username) {
+  //     setFadeClass("fade-background");
+  //     setDisableGuesses(true);
+  //     setTimeout(() => {
+  //       setFadeClass("");
+  //       setDisableGuesses(false);
+  //     }, 3000);
+  //   }
+  // }, [game?.clue, username]);
 
   if (!game) {
     return null;
@@ -321,8 +323,8 @@ function Game({
         : !remainingTime
           ? ""
           : Math.floor(remainingTime / 60) +
-            ":" +
-            ("0" + Math.floor(remainingTime % 60)).slice(-2);
+          ":" +
+          ("0" + Math.floor(remainingTime % 60)).slice(-2);
 
   if (game.finalScore !== undefined) {
     return (
@@ -408,17 +410,19 @@ function Game({
           )}
         </div>
       </div>
-      <CurrentClue
-        game={game}
-        username={username}
-        isSmallScreen={isSmallScreen}
-      />
-      <ClueUI
-        game={game}
-        username={username}
-        giveClue={giveClue}
-        isSmallScreen={isSmallScreen}
-      />
+      <div style={{ minHeight: "80px" }}>
+        <CurrentClue
+          game={game}
+          username={username}
+          isSmallScreen={isSmallScreen}
+        />
+        <ClueUI
+          game={game}
+          username={username}
+          giveClue={giveClue}
+          isSmallScreen={isSmallScreen}
+        />
+      </div>
       <GameGrid
         game={game}
         guess={guess}
