@@ -193,7 +193,9 @@ function GameGrid({ game, guess, username, disableGuesses, isSmallScreen }) {
                         ? "red"
                         : isUsed(rowIndex, colIndex)
                           ? "lightgreen"
-                          : "white",
+                          : isDisabled(rowIndex, colIndex)
+                            ? "white"
+                            : "lightgray",
                       padding: 0,
                       height: "60px"
                     }}
@@ -584,6 +586,9 @@ export default function GamePage() {
         <Button variant="outlined" onClick={handleDialogOpen}>
           Your name: {displayName}
         </Button>
+        <Typography variant="caption" style={{ color: "gray", marginLeft: "10px" }}>
+          Players holding cards: {game?.outstanding?.map(clue => getDisplayName(clue.username)).join(", ")}
+        </Typography>
       </div>
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Edit Display Name</DialogTitle>
