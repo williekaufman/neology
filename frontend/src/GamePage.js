@@ -302,16 +302,16 @@ function Game({
     setRemainingTime(game?.remainingTime);
   }, [game?.remainingTime]);
 
-  // useEffect(() => {
-  //   if (game?.clue && game.clue.username !== username) {
-  //     setFadeClass("fade-background");
-  //     setDisableGuesses(true);
-  //     setTimeout(() => {
-  //       setFadeClass("");
-  //       setDisableGuesses(false);
-  //     }, 3000);
-  //   }
-  // }, [game?.clue, username]);
+  useEffect(() => {
+    if (game?.clue && game.clue.username !== username && isSmallScreen) {
+      setFadeClass("fade-background");
+      setDisableGuesses(true);
+      setTimeout(() => {
+        setFadeClass("");
+        setDisableGuesses(false);
+      }, 3000);
+    }
+  }, [game?.clue, username]);
 
   if (!game) {
     return null;
